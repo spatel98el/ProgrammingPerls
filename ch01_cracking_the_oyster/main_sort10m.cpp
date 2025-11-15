@@ -8,62 +8,59 @@
 #include <memory>
 #include <fstream>
 #include <vector>
+#include <chrono>
+#include <string>
+
+// My bitmap
+#include <Bitmap.hpp>
 
 using namespace std;
 
-void setBitPosition(int position, int *bitMap) {
-    // set index of the bit position
-    // set some fixed offsets
-    // byte offset = number / 8
-    // bit offset = number % 8
-    int byOff = position / 8;
-    int biOff = position % 8;
-
-    bitMap[byOff] |= 1 << biOff;
-}
-
-bool getBitValue(int position, const int * const bitMap) {
-    return ((bitMap[position/8] & (0x1 << position%8)) != 0);
-}
-
 int main() {
     
-    cout << "main_sort_10m" << endl;
+    cout << "main_sort_10m:" << endl;
 
-    // allocate required bit storage
-    const int maxDataLen = 10000; //start with 10k
-    constexpr auto arrayLen = (maxDataLen/8) + (maxDataLen%8) + 8; // len + spare 8 bits!    
-    int bitMap[arrayLen] = {0};
+    int maxDataLen = 100000;
 
+    cout << "Provide input data file path" << endl;
+    string fpath;
+    getline(cin, fpath);
+
+    // create new bitmap
+    auto bm = new Bitmap(maxDataLen);
 
     //check couple of valid bit positions
-    cout << getBitValue(0, bitMap) << "," << getBitValue(1000 , bitMap) << "," << getBitValue(9999, bitMap) << endl;
+    cout << bm->getBitValue(0) << "," << bm->getBitValue(1000) << "," << bm->getBitValue(9999) << endl;
 
-    // Read file containing intergers as string
-    ifstream datafile("./data/data_10k.txt");
+    // Read file containing intergers as string, open file for write back
+    ifstream datafile(fpath);
+    if(!datafile.is_open()) {
+        cout << "Error in opening file : " << fpath << endl;
+        return -1;
+    }
+    ofstream ofile("./data/sorted_data.txt");
+        if(!ofile.is_open()) {
+        cout << "Error in opening output file "<< endl;
+        return -1;
+    }
+
+    auto start = chrono::system_clock::now();
 
     // go through all the bits and write back corresponding output to file
-    // also track dups
-    int counter = 0;
     for(int val; datafile >> val;) {
-        if(getBitValue(val, bitMap)) {
-            counter++;
-        } else {
-            setBitPosition(val, bitMap);
-        }
+        bm->setBitPosition(val);
     }
-    datafile.close();
-
-    //check couple of bit positions
-    cout << getBitValue(86, bitMap) << "," << getBitValue(7705, bitMap) << "," << getBitValue(3097, bitMap) << endl;
 
     // sequentially iterate bit positions if bit it set write back position to the file
-    ofstream ofile("./data/sorted_data.txt");
-    for(int pos = 0; pos < maxDataLen; pos++) {
-        if(getBitValue(pos, bitMap))
+    for(int pos = 0; pos <= maxDataLen; pos++) {
+        if(bm->getBitValue(pos))
             ofile << pos << endl;
     }
-    ofile.close();
 
-    cout << "number of dups : " << counter << endl;
+    auto end = chrono::system_clock::now();
+    auto diff = chrono::duration_cast<chrono::microseconds>(end - start);
+    cout << "Running time : " << diff.count() << endl;
+
+    ofile.close();
+    datafile.close();
 }
