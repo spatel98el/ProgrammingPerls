@@ -1,4 +1,7 @@
 # Programming Perls by Jon Bently
 
-Solutions implementation of the book.
-Most of the code would be in C++ but should have some C and ASM experiments within
+Implementation of ideas (possibly all) discussed in the book.
+
+Here are the chapter specific notes covering more details on the experiments and implmentations
+
+- [ch01_cracking_the_oyster](./ch01_cracking_the_oyster/doc/ch01_cracking_the_oyster.md)

@@ -9,6 +9,8 @@
 #include <algorithm>
 #include <chrono>
 
+#include <SimpleProfiler.hpp>
+
 using namespace std;
 
 int main() {
@@ -17,7 +19,9 @@ int main() {
     ofstream ofile("./data/ex1_sorted_data.txt");
     vector<int> inData;
 
-    auto start = chrono::system_clock::now();
+    // Profiler
+    SimpleProfiler prof;
+    prof.startTimeProf();
 
     for(int val; datafile >> val;) {
         inData.push_back(val);
@@ -31,9 +35,8 @@ int main() {
         ofile << val << endl;
     }
 
-    auto end = chrono::system_clock::now();
-    auto diff = chrono::duration_cast<chrono::microseconds>(end - start);
-    cout << "Running time : " << diff.count() << endl;
+    prof.endTimeProf();
+    prof.printRunningTime();
 
     // clean up
     datafile.close();

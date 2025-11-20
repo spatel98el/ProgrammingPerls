@@ -8,11 +8,11 @@
 #include <memory>
 #include <fstream>
 #include <vector>
-#include <chrono>
 #include <string>
 
 // My bitmap
 #include <Bitmap.hpp>
+#include <SimpleProfiler.hpp>
 
 using namespace std;
 
@@ -44,7 +44,8 @@ int main() {
         return -1;
     }
 
-    auto start = chrono::system_clock::now();
+    SimpleProfiler prof;
+    prof.startTimeProf();
 
     // go through all the bits and write back corresponding output to file
     for(int val; datafile >> val;) {
@@ -57,9 +58,8 @@ int main() {
             ofile << pos << endl;
     }
 
-    auto end = chrono::system_clock::now();
-    auto diff = chrono::duration_cast<chrono::microseconds>(end - start);
-    cout << "Running time : " << diff.count() << endl;
+    prof.endTimeProf();
+    prof.printRunningTime();
 
     ofile.close();
     datafile.close();
