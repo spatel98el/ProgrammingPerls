@@ -27,16 +27,12 @@ int main() {
     while(cin >> data) {
         rangeTracker[0].push_back(data);
     }
-    
+
     unsigned int bitMask = 0x80000000;
     vector<int> &rangeVec;
     for (int i = 0, data = 0; i < 32; i++, bitMask >>= 1)
     {
-        if(i == 0) {
-            fin >> data;
-        } else {
-            data = rangeVec
-        }
+
         while (cin >> data)
         {
             if (data & bitMask)

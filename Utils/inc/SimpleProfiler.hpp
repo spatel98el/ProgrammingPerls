@@ -11,12 +11,17 @@
 
 namespace std
 {
+    enum class Resolution{
+        USEC = 1,
+        NSEC= 2,
+    };
+
     class SimpleProfiler
     {
     public:
         typedef chrono::system_clock::time_point timepoint;
 
-        SimpleProfiler() {
+        SimpleProfiler(Resolution res=Resolution::USEC) : res(res) {
             // select preferences , clock type. precision etc
         };
         ~SimpleProfiler() {
@@ -36,8 +41,13 @@ namespace std
         void printRunningTime()
         {
             // end - start
-            auto diff = chrono::duration_cast<chrono::microseconds>(end - start);
-            cout << "Running time : " << diff.count() << " usec" << endl;
+            if (res == Resolution :: NSEC) {
+                auto diff = chrono::duration_cast<chrono::nanoseconds>(end - start);
+                cout << "Running time : " << diff.count() << " nsec" << endl;
+            } else {
+                auto diff = chrono::duration_cast<chrono::microseconds>(end - start);
+                cout << "Running time : " << diff.count() << " usec" << endl;
+            }
         }
 
     private:
@@ -46,5 +56,8 @@ namespace std
 
         // end time point
         timepoint end;
+
+        // Resolution
+        Resolution res;
     };
 };
