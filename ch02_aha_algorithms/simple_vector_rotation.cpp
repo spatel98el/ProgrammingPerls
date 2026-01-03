@@ -73,43 +73,116 @@ bool reverseOpt(vector<int> &a, int start, int end) {
     return true;
 }
 
-int main() {
+bool reverseJuggling(vector<int> &a, int rot) {
 
-    vector<int> input{};
-    for(int i = 0; i < 100; i++)
-        input.push_back(i);
-        
+    if(a.size() <= rot) {
+        return false;
+    }
+    // this is lsl op
+    // from 0-n -> 0-i:i+1-n ->i+1-n:0-1
+    // use one temp location
+    int n = a.size();
+    for(int j=0,t=0,k=0; j < rot;j++) {
+        t = a[j];
+        for(k=j; k + rot < n; k += rot) {
+            a[k] = a[k+rot];
+        }
+        // k <= n , k + rot > n
+        a[n- (rot - j)] = t;
+    }
+
+    // case 1 :
+    // n = 9, rot = 3
+    // j : 0 -> k -> {0, 3, 6} -> a[6] = a[0]
+    // j : 1 -> k {1, 4} -> a[7] = a[1]
+    // ..
+
+    // case 2:
+    // n = 10, rot = 3
+    // j : 0 -> k {0, 3, 6} -> a[7] = a[0]
+    // j : 1 -> k {1, 4} -> a[8] = a[1]
+
+    return true;
+}
+
+int main() {
     SimpleProfiler prof(Resolution::NSEC);
 
-    cout << "Original:" << endl;
-    PRINTVEC(input);
+    {
+        vector<int> input{};
+        for (int i = 0; i < 100; i++)
+            input.push_back(i);
 
-    prof.startTimeProf();
-    reverse(input, 0, 9);
-    reverse(input, 9, input.size());
-    reverse(input, 0, input.size());
-    prof.endTimeProf();
-    prof.printRunningTime();
+        cout << "Original:" << endl;
+        PRINTVEC(input);
 
-    cout << "Rotated:" << endl;
-    PRINTVEC(input);
+        prof.startTimeProf();
+        reverse(input, 0, 9);
+        reverse(input, 9, input.size());
+        reverse(input, 0, input.size());
+        prof.endTimeProf();
+        prof.printRunningTime();
 
-    cout << "Optimized reverse:" << endl;
-    vector<int> test {};
+        cout << "Rotated:" << endl;
+        PRINTVEC(input);
+    }
 
-    for(int i = 0; i < 100; i++)
-        test.push_back(i);
-    PRINTVEC(test);
-    prof.startTimeProf();
+    {
+        cout << "Optimized reverse:" << endl;
+        vector<int> test{};
 
-    reverseOpt(test, 0, 3);
-    reverseOpt(test, 4, test.size()-1);
-    reverseOpt(test, 0, test.size()-1);
+        for (int i = 0; i < 100; i++)
+            test.push_back(i);
+        PRINTVEC(test);
+        prof.startTimeProf();
 
-    prof.endTimeProf();
-    prof.printRunningTime();
-    
-    cout << "Rotated:" << endl;
-    PRINTVEC(test);
+        reverseOpt(test, 0, 3);
+        reverseOpt(test, 4, test.size() - 1);
+        reverseOpt(test, 0, test.size() - 1);
 
+        prof.endTimeProf();
+        prof.printRunningTime();
+
+        cout << "Rotated:" << endl;
+        PRINTVEC(test);
+    }
+    {
+        cout << "Juggling reverse - Not working:" << endl;
+        vector<int> test{};
+
+        for (int i = 0; i < 10; i++)
+            test.push_back(i);
+        PRINTVEC(test);
+        prof.startTimeProf();
+
+        reverseJuggling(test, 3);
+
+        prof.endTimeProf();
+        prof.printRunningTime();
+
+        cout << "Rotated:" << endl;
+        PRINTVEC(test);
+    }
+
+    {
+        // abc->cba
+        cout << "Reverse 3 segments , problem 5" << endl;
+                vector<int> test{};
+
+        for (int i = 0; i < 10; i++)
+            test.push_back(i);
+        PRINTVEC(test);
+
+        reverseOpt(test, 0, 3); //ar
+
+        reverseOpt(test, 4, 6);//br
+        reverseOpt(test, 7, 9);//cr
+
+        reverseOpt(test, 4, 9); //brcrr -> cb
+        reverseOpt(test, 4, 9); // cb -> cbr
+
+        reverseOpt(test, 0, 9); //(ar(cbr))r
+
+        PRINTVEC(test);
+    }
 }
